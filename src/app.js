@@ -18,10 +18,7 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 
-// Dev logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+// Request logging middleware (always enabled for debugging)\napp.use(morgan('dev'));\nconsole.log('📋 Morgan request logging ENABLED');
 
 // Security headers
 app.use(helmet());
@@ -37,7 +34,7 @@ app.use(limiter);
 
 // Enable CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'],
   credentials: true
 }));
 

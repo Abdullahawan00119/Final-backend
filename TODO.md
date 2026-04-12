@@ -1,13 +1,15 @@
-# Task Progress: Fix MongoDB Connection Timeout
+# Task Progress: Fix Authentication Logging Issues
 
-## TODO Steps (from approved plan):
-- [x] 1. Create `backend/src/utils/db.js` - Centralized DB connection with retries
-- [x] 2. Update `backend/server.js` - Use async connectDB(), start server only after success
-- [x] 3. Update `backend/src/app.js` - Add `/api/health` endpoint for DB status check
-- [x] 4. Test connection: `cd backend && npm run dev` → Used `node server.js` (nodemon missing)
-- [x] 5. Verify: curl http://localhost:5000/api/health ✓
+Current Status: **PLAN APPROVED** - Implementing debug logging for login/auth flow.
 
-**COMPLETE! Server & DB healthy. Use Ctrl+C to stop, nodemon optional.**
+## TODO Steps:
+- [x] 1. Update server.js - Add explicit NODE_ENV logging
+- [x] 2. Update app.js - Enable morgan logging always + NODE_ENV check
+- [x] 3. Update middleware/authenticate.js - Add token validation & user fetch logs
+- [x] 4. Update controllers/authController.js - Add detailed login flow logs
+- [x] 5. Test login flow: Check console output during failed/successful login\n- [x] 6. Verify frontend behavior with new logs
+**DONE** - All steps complete. Remove logs later if too verbose.
+
+**TEST:** Restart server (`cd backend && npm run dev`), try login. Logs now visible!\n**Status: Logging FIXED 🎉**
 
 Progress will be updated after each step.
-

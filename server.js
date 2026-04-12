@@ -6,6 +6,12 @@ const connectDB = require('./src/utils/db');
 
 dotenv.config();
 
+console.log('Server starting...');
+console.log('NODE_ENV:', process.env.NODE_ENV || 'undefined');
+console.log('PORT:', process.env.PORT || 5000);
+console.log('JWT_SECRET present:', !!process.env.JWT_SECRET);
+console.log('MONGODB_URI present:', !!process.env.MONGODB_URI);
+
 const PORT = process.env.PORT || 5000;
 
 // Async main function
