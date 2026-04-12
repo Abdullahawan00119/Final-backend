@@ -1,34 +1,42 @@
 const app = require('./src/app');
-const mongoose = require('mongoose');
 const http = require('http');
 const { Server } = require('socket.io');
 const dotenv = require('dotenv');
+const connectDB = require('./src/utils/db');
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to Database
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB Connected...'))
-  .catch(err => console.error('MongoDB Connection Error:', err));
+// Async main function
+const startServer = async () => {
+  try {
+    // Connect to Database first
+    await connectDB();
+    
+    const server = http.createServer(app);
 
-const server = http.createServer(app);
+    // Socket.io Setup
+    const io = new Server(server, {
+      cors: {
+        origin: process.env.FRONTEND_URL,
+        methods: ['GET', 'POST'],
+        credentials: true
+      }
+    });
 
-// Socket.io Setup
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL,
-    methods: ['GET', 'POST'],
-    credentials: true
+    app.set('io', io);
+
+    const socketHandler = require('./src/socket/socketHandler');
+    socketHandler(io);
+
+    server.listen(PORT, () => {
+      console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
-});
+};
 
-app.set('io', io);
-
-const socketHandler = require('./src/socket/socketHandler');
-socketHandler(io);
-
-server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+startServer();

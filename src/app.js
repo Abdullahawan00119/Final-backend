@@ -41,6 +41,24 @@ app.use(cors({
   credentials: true
 }));
 
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    await require('./models/User').countDocuments(); // Simple DB ping
+    res.status(200).json({ 
+      success: true, 
+      message: 'Server & DB healthy',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'DB connection failed',
+      error: error.message 
+    });
+  }
+});
+
 // Mount routers
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
