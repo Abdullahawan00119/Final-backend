@@ -33,6 +33,7 @@ exports.createReview = async (req, res) => {
       reviewer: req.user.id,
       reviewee: orderDoc.provider,
       order,
+      service: orderDoc.service, // Link to the service
       overallRating,
       comment,
       ratings

@@ -44,6 +44,7 @@ const jobSchema = new mongoose.Schema({
   },
   
   images: [{ type: String }],
+  videoUrl: { type: String },
   
   postedBy: { 
     type: mongoose.Schema.Types.ObjectId, 

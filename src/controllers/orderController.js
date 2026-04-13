@@ -9,7 +9,6 @@ const { sendNotification } = require('../utils/notificationHelper');
 exports.createOrder = async (req, res) => {
   try {
     const { serviceId, jobId, amount, orderType, packageType } = req.body;
-    
     let providerId;
     if (orderType === 'service') {
       const service = await Service.findById(serviceId);
@@ -19,6 +18,10 @@ exports.createOrder = async (req, res) => {
       const job = await Job.findById(jobId);
       if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
       providerId = job.hiredProvider;
+    }
+
+    if (req.user.id === providerId.toString()) {
+      return res.status(400).json({ success: false, message: 'You cannot place an order for your own service or job' });
     }
 
     const order = await Order.create({
@@ -53,6 +56,10 @@ exports.createOrder = async (req, res) => {
 // @access  Private
 exports.getOrders = async (req, res) => {
   try {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ success: false, message: 'User role not found' });
+    }
+
     let query = {};
     if (req.user.role === 'customer') {
       query = { customer: req.user.id };

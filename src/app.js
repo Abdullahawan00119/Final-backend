@@ -18,7 +18,9 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 
-// Request logging middleware (always enabled for debugging)\napp.use(morgan('dev'));\nconsole.log('📋 Morgan request logging ENABLED');
+// Request logging middleware (always enabled for debugging)
+app.use(morgan('dev'));
+console.log('📋 Morgan request logging ENABLED');
 
 // Security headers
 app.use(helmet());

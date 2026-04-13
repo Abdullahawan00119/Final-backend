@@ -18,11 +18,14 @@ const socketHandler = (io) => {
     socket.on('send_message', (data) => {
       const { conversationId, receiverId, message } = data;
       
-      // Emit to the conversation room
-      io.to(conversationId).emit('new_message', message);
-
-      // Also send notification if receiver is online but not in room
+      // Emit to receiver only (not sender), plus conversation room for offline/online safety
       const receiverSocketId = onlineUsers.get(receiverId);
+      if (receiverSocketId && receiverSocketId !== socket.id) {
+        io.to(receiverSocketId).emit('new_message', message);
+      }
+      // Removed room emit to prevent sender receiving own message
+
+      // Send notification to receiver
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('notification_received', {
           type: 'message_received',
@@ -33,18 +36,12 @@ const socketHandler = (io) => {
       }
     });
 
-    socket.on('typing_start', (data) => {
-      socket.to(data.conversationId).emit('user_typing', {
-        userId: data.userId,
-        isTyping: true
-      });
+socket.on('typing', (data) => {
+      socket.to(data.conversationId).emit('typing', data);
     });
 
-    socket.on('typing_stop', (data) => {
-      socket.to(data.conversationId).emit('user_typing', {
-        userId: data.userId,
-        isTyping: false
-      });
+    socket.on('stop_typing', (data) => {
+      socket.to(data.conversationId).emit('stop_typing', data);
     });
 
     socket.on('disconnect', () => {

@@ -17,6 +17,10 @@ const reviewSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  service: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Service'
+  },
   
   overallRating: { type: Number, required: true, min: 1, max: 5 },
   

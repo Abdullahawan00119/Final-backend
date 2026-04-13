@@ -80,26 +80,38 @@ exports.getUserProfile = async (req, res) => {
 // @access  Private
 exports.updateProfile = async (req, res) => {
   try {
-    const fieldsToUpdate = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      bio: req.body.bio,
-      phone: req.body.phone,
-      location: req.body.location,
-      skills: req.body.skills,
-      hourlyRate: req.body.hourlyRate,
-      yearsOfExperience: req.body.yearsOfExperience,
-      certifications: req.body.certifications,
-      avatar: req.body.avatar
-    };
+    // Build update object, only including fields that were actually sent
+    const fieldsToUpdate = {};
 
-    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
-      new: true,
-      runValidators: true
-    });
+    if (req.body.firstName !== undefined) fieldsToUpdate.firstName = req.body.firstName;
+    if (req.body.lastName !== undefined) fieldsToUpdate.lastName = req.body.lastName;
+    if (req.body.bio !== undefined) fieldsToUpdate.bio = req.body.bio;
+    if (req.body.phone !== undefined) fieldsToUpdate.phone = req.body.phone;
+    if (req.body.avatar !== undefined) fieldsToUpdate.avatar = req.body.avatar;
+    if (req.body.skills !== undefined) fieldsToUpdate.skills = req.body.skills;
+    if (req.body.hourlyRate !== undefined) fieldsToUpdate.hourlyRate = req.body.hourlyRate;
+    if (req.body.yearsOfExperience !== undefined) fieldsToUpdate.yearsOfExperience = req.body.yearsOfExperience;
+    if (req.body.certifications !== undefined) fieldsToUpdate.certifications = req.body.certifications;
+
+    // Handle nested location object
+    if (req.body.location) {
+      if (req.body.location.city) fieldsToUpdate['location.city'] = req.body.location.city;
+      if (req.body.location.area !== undefined) fieldsToUpdate['location.area'] = req.body.location.area;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: fieldsToUpdate },
+      { new: true, runValidators: true, context: 'query' }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
     res.status(200).json({ success: true, data: user });
   } catch (error) {
+    console.error('Profile update error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
